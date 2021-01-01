@@ -9,24 +9,28 @@ use Alura\Leilao\Infra\ConnectionCreator;
 
 class LeilaoDaoTest extends TestCase
 {
-    private $pdo;
+    private static $pdo;
 
-    public function setUp() : void 
+    public static function setUpBeforeClass() : void
     {
-        $this->pdo = new \PDO('sqlite::memory:');
-        $this->pdo->exec('create table leiloes (
+        self::$pdo = new \PDO('sqlite::memory:');
+        self::$pdo->exec('create table leiloes (
             id INTEGER primary key,
             descricao TEXT,
             finalizado BOOL,
             dataInicio TEXT
         );');
-        $this->pdo->beginTransaction();
+    }
+
+    public function setUp() : void 
+    {
+        self::$pdo->beginTransaction();
     }
 
     public function testInsercaoEBuscaDevemFuncionar()
     {
         $leilao = new Leilao('Variante 0KM');
-        $leilaoDao = new LeilaoDao($this->pdo);
+        $leilaoDao = new LeilaoDao(self::$pdo);
 
         $leilaoDao->salva($leilao);
 
@@ -39,6 +43,6 @@ class LeilaoDaoTest extends TestCase
 
     public function tearDown() : void
     {
-        $this->pdo->rollBack();
+        self::$pdo->rollBack();
     }
 }
