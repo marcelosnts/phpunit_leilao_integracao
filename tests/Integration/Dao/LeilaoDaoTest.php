@@ -27,12 +27,13 @@ class LeilaoDaoTest extends TestCase
         self::$pdo->beginTransaction();
     }
 
-    public function testInsercaoEBuscaDevemFuncionar()
+    /** @dataProvider leiloes */
+    public function testBuscarLeiloesNaoFinalizados($leiloes)
     {
-        $leilao = new Leilao('Variante 0KM');
         $leilaoDao = new LeilaoDao(self::$pdo);
-
-        $leilaoDao->salva($leilao);
+        foreach ($leiloes  as $leilao) {
+            $leilaoDao->salva($leilao);
+        }
 
         $leiloes = $leilaoDao->recuperarNaoFinalizados();
 
@@ -41,8 +42,36 @@ class LeilaoDaoTest extends TestCase
         self::assertSame('Variante 0KM', $leiloes[0]->recuperarDescricao());
     }
 
+    /** @dataProvider leiloes */
+    public function testBuscarLeiloesFinalizados($leiloes)
+    {
+        $leilaoDao = new LeilaoDao(self::$pdo);
+        foreach ($leiloes  as $leilao) {
+            $leilaoDao->salva($leilao);
+        }
+
+        $leiloes = $leilaoDao->recuperarFinalizados();
+
+        self::assertCount(1, $leiloes);
+        self::assertContainsOnlyInstancesOf(Leilao::class, $leiloes);
+        self::assertSame('Fiat 147 0KM', $leiloes[0]->recuperarDescricao());
+    }
+
     public function tearDown() : void
     {
         self::$pdo->rollBack();
+    }
+
+    public function leiloes()
+    {
+        $naoFinalizado = new Leilao('Variante 0KM');
+        $finalizado = new Leilao('Fiat 147 0KM');
+        $finalizado->finaliza();
+
+        return [
+            [
+                [$naoFinalizado, $finalizado]
+            ]
+        ];
     }
 }
