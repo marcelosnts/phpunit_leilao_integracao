@@ -8,8 +8,12 @@
             <directory>tests/Unit</directory>
         </testsuite>
 
-        <testsuite name="integration">
-            <directory>tests/Integration</directory>
+        <testsuite name="integrationDao">
+            <directory>tests/Integration/Dao</directory>
+        </testsuite>
+
+        <testsuite name="integrationApi">
+            <directory>tests/Integration/Web</directory>
         </testsuite>
     </testsuites>
 
